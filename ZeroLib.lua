@@ -888,7 +888,7 @@ function ZeroLib:CreateWindow(config)
         rightColumn.Size = UDim2.new(0.5, -4, 1, 0)
         rightColumn.Position = UDim2.new(0.5, 4, 0, 0)
         rightColumn.BackgroundTransparency = 1
-        rightColumn.Parent = rightColumn
+        rightColumn.Parent = tabPage
 
         local rightLayout = Instance.new("UIListLayout")
         rightLayout.Padding = UDim.new(0, 6)
