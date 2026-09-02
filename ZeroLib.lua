@@ -1991,8 +1991,6 @@ function ZeroLib:CreateWindow(config)
                     local absSize = dropBtn.AbsoluteSize
 
                     if open then
-                        if os.clock() - self.LastCloseTime < 0.15 then return end
-
                         if ZeroLib.ActivePopover and ZeroLib.ActivePopover.Close then
                             ZeroLib.ActivePopover.Close()
                         end
@@ -2019,7 +2017,6 @@ function ZeroLib:CreateWindow(config)
                         }
                     else
                         self.IsOpen = false
-                        self.LastCloseTime = os.clock()
 
                         tween(arrow, TweenInfo.new(0.16, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Rotation = 0 })
                         local closeTw = tween(dropMenu, TweenInfo.new(0.16, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
@@ -2095,11 +2092,7 @@ function ZeroLib:CreateWindow(config)
                 end
 
                 dropBtn.MouseButton1Click:Connect(function()
-                    if DropObj.IsOpen then
-                        DropObj:ToggleMenu(false)
-                    else
-                        DropObj:ToggleMenu(true)
-                    end
+                    DropObj:ToggleMenu()
                 end)
 
                 ZeroLib.Options[id] = DropObj
