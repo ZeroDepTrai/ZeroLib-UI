@@ -1587,9 +1587,15 @@ end)()
             end
 
             -- 2. BUTTON COMPONENT (CLEAN MODERN)
-            function Group:AddButton(btnConfig)
-                local text = btnConfig.Text or "Button"
-                local callback = btnConfig.Func or btnConfig.Callback or function() end
+            function Group:AddButton(btnConfig, callbackArg)
+                local text, callback
+                if type(btnConfig) == "table" then
+                    text = btnConfig.Text or "Button"
+                    callback = btnConfig.Func or btnConfig.Callback or function() end
+                else
+                    text = tostring(btnConfig or "Button")
+                    callback = callbackArg or function() end
+                end
 
                 local btn = Instance.new("TextButton")
                 btn.Size = UDim2.new(1, 0, 0, 24)
@@ -2140,6 +2146,12 @@ end)()
 
                 ZeroLib:RegisterThemeObject(div, "BackgroundColor3", "CardStroke")
                 return div
+            end
+
+                        function Group:Resize()
+                pcall(function()
+                    card.Size = UDim2.new(1, 0, 0, cLayout.AbsoluteContentSize.Y + 34)
+                end)
             end
 
             return Group
