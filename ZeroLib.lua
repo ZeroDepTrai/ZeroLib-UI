@@ -131,9 +131,16 @@ local ZeroLib = {
     Font = DevFont
 }
 
-getgenv().Toggles = ZeroLib.Toggles
-getgenv().Options = ZeroLib.Options
-getgenv().ZeroLib = ZeroLib
+local globalEnv = (getgenv and getgenv()) or _G
+globalEnv.Toggles = ZeroLib.Toggles
+globalEnv.Options = ZeroLib.Options
+globalEnv.ZeroLib = ZeroLib
+pcall(function() shared.ZeroLib = ZeroLib end)
+pcall(function() shared.Toggles = ZeroLib.Toggles end)
+pcall(function() shared.Options = ZeroLib.Options end)
+pcall(function() _G.ZeroLib = ZeroLib end)
+pcall(function() _G.Toggles = ZeroLib.Toggles end)
+pcall(function() _G.Options = ZeroLib.Options end)
 
 -- Lucide / Material Icon Assets
 local Icons = {
