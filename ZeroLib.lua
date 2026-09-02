@@ -145,7 +145,7 @@ pcall(function() _G.Options = ZeroLib.Options end)
 
 local Icons = {
     Combat = "rbxassetid://10734975692",   -- Material Symbols: Swords
-    Farm = "rbxassetid://10723405364",     -- Material Symbols: Sprout / Leaf
+    Farm = "rbxassetid://10709769841",     -- Material Symbols: Sprout / Leaf
     World = "rbxassetid://10723415903",    -- Material Symbols: Globe
     Teleport = "rbxassetid://10723415903", -- Material Symbols: Globe / Portal
     Settings = "rbxassetid://10734950309", -- Material Symbols: Sliders
