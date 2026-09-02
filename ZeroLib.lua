@@ -411,7 +411,7 @@ function ZeroLib:Notify(data)
     applyFont(titleLabel, "Bold")
     titleLabel.Text = title
     titleLabel.TextColor3 = theme.TextMain
-    titleLabel.TextSize = 11
+    titleLabel.TextSize = 13
     titleLabel.TextXAlignment = Enum.TextXAlignment.Left
     titleLabel.Parent = card
 
@@ -422,7 +422,7 @@ function ZeroLib:Notify(data)
     applyFont(contentLabel, "Regular")
     contentLabel.Text = content
     contentLabel.TextColor3 = theme.TextMuted
-    contentLabel.TextSize = 10
+    contentLabel.TextSize = 11.5
     contentLabel.TextWrapped = true
     contentLabel.TextXAlignment = Enum.TextXAlignment.Left
     contentLabel.TextYAlignment = Enum.TextYAlignment.Top
@@ -521,7 +521,7 @@ function ZeroLib:SetWatermark(gameTitle)
         label.BackgroundTransparency = 1
         applyFont(label, "Bold")
         label.TextColor3 = theme.TextMain
-        label.TextSize = 10
+        label.TextSize = 11.5
         label.Parent = wmFrame
 
         self.Watermark = { Gui = wmGui, Frame = wmFrame, Label = label, Line = accentLine, Title = gameTitle }
@@ -1168,7 +1168,7 @@ function ZeroLib:CreateWindow(config)
                 applyFont(hexInput, "Bold")
                 hexInput.Text = "#" .. curColor:ToHex():upper()
                 hexInput.TextColor3 = theme.TextMain
-                hexInput.TextSize = 10
+                hexInput.TextSize = 11.5
                 hexInput.ZIndex = 701
                 hexInput.Parent = bottomRow
 
@@ -1228,7 +1228,7 @@ function ZeroLib:CreateWindow(config)
                     applyFont(tb, "Medium")
                     tb.Text = tostring(math.floor(initialVal * 255))
                     tb.TextColor3 = theme.TextMain
-                    tb.TextSize = 9.5
+                    tb.TextSize = 11
                     tb.ZIndex = 702
                     tb.Parent = f
 
@@ -1410,7 +1410,7 @@ function ZeroLib:CreateWindow(config)
                 applyFont(label, "Medium")
                 label.Text = text
                 label.TextColor3 = default and theme.TextMain or theme.TextMuted
-                label.TextSize = 10
+                label.TextSize = 11.5
                 label.TextXAlignment = Enum.TextXAlignment.Left
                 label.Parent = row
 
@@ -1501,7 +1501,7 @@ function ZeroLib:CreateWindow(config)
                     applyFont(kbBtn, "Bold")
                     kbBtn.Text = kbDefault.Name ~= "Unknown" and kbDefault.Name or "NONE"
                     kbBtn.TextColor3 = theme.TextMuted
-                    kbBtn.TextSize = 8.5
+                    kbBtn.TextSize = 10
                     kbBtn.LayoutOrder = 1
                     kbBtn.Parent = subContainer
 
@@ -1633,7 +1633,7 @@ function ZeroLib:CreateWindow(config)
                 applyFont(btn, "Bold")
                 btn.Text = text
                 btn.TextColor3 = theme.TextMain
-                btn.TextSize = 10.5
+                btn.TextSize = 12
                 btn.Parent = container
 
                 local bCorner = Instance.new("UICorner")
@@ -1691,7 +1691,7 @@ function ZeroLib:CreateWindow(config)
                 applyFont(valLabel, "Bold")
                 valLabel.Text = tostring(default) .. suffix
                 valLabel.TextColor3 = theme.Accent
-                valLabel.TextSize = 10
+                valLabel.TextSize = 11.5
                 valLabel.TextXAlignment = Enum.TextXAlignment.Right
                 valLabel.Parent = row
 
@@ -1856,7 +1856,7 @@ function ZeroLib:CreateWindow(config)
                 applyFont(dropBtn, "Medium")
                 dropBtn.Text = "  " .. getDisplayText(initialValue)
                 dropBtn.TextColor3 = theme.TextMain
-                dropBtn.TextSize = 10
+                dropBtn.TextSize = 11.5
                 dropBtn.TextXAlignment = Enum.TextXAlignment.Left
                 dropBtn.Parent = row
 
@@ -1876,7 +1876,7 @@ function ZeroLib:CreateWindow(config)
                 applyFont(arrow, "Bold")
                 arrow.Text = "▼"
                 arrow.TextColor3 = theme.TextMuted
-                arrow.TextSize = 8
+                arrow.TextSize = 9.5
                 arrow.Parent = dropBtn
 
                 ZeroLib:RegisterThemeObject(label, "TextColor3", "TextMuted")
@@ -1944,7 +1944,7 @@ function ZeroLib:CreateWindow(config)
                         applyFont(itemBtn, "Medium")
                         itemBtn.Text = (isMulti and (selected and "  ✓ " or "  - ") or "  ") .. tostring(v)
                         itemBtn.TextColor3 = selected and curTheme.Accent or curTheme.TextMuted
-                        itemBtn.TextSize = 10
+                        itemBtn.TextSize = 11.5
                         itemBtn.TextXAlignment = Enum.TextXAlignment.Left
                         itemBtn.ZIndex = 601
                         itemBtn.Parent = dropMenu
@@ -2140,7 +2140,7 @@ function ZeroLib:CreateWindow(config)
                 textBox.PlaceholderText = placeholder
                 textBox.TextColor3 = theme.TextMain
                 textBox.PlaceholderColor3 = theme.TextDark
-                textBox.TextSize = 10
+                textBox.TextSize = 11.5
                 textBox.TextXAlignment = Enum.TextXAlignment.Left
                 textBox.Parent = boxFrame
 
@@ -2286,7 +2286,7 @@ function ZeroLib:CreateWindow(config)
                     applyFont(kbBtn, "Bold")
                     kbBtn.Text = kbDefault.Name ~= "Unknown" and kbDefault.Name or "NONE"
                     kbBtn.TextColor3 = theme.TextMuted
-                    kbBtn.TextSize = 8.5
+                    kbBtn.TextSize = 10
                     kbBtn.Parent = subContainer
 
                     local kCorner = Instance.new("UICorner")
