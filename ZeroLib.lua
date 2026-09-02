@@ -677,7 +677,7 @@ function ZeroLib:CreateWindow(config)
     applyFont(titleLabel, "Bold")
     titleLabel.Text = titleText
     titleLabel.TextColor3 = theme.TextMain
-    titleLabel.TextSize = 11.5
+    titleLabel.TextSize = 13
     titleLabel.TextXAlignment = Enum.TextXAlignment.Left
     titleLabel.Parent = topbar
 
@@ -699,7 +699,7 @@ function ZeroLib:CreateWindow(config)
     applyFont(minBtn, "Bold")
     minBtn.Text = "-"
     minBtn.TextColor3 = theme.TextMuted
-    minBtn.TextSize = 12
+    minBtn.TextSize = 13
     minBtn.Parent = controlsFrame
 
     local minCorner = Instance.new("UICorner")
@@ -714,7 +714,7 @@ function ZeroLib:CreateWindow(config)
     applyFont(closeBtn, "Bold")
     closeBtn.Text = "X"
     closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    closeBtn.TextSize = 10.5
+    closeBtn.TextSize = 12
     closeBtn.Parent = controlsFrame
 
     local closeCorner = Instance.new("UICorner")
@@ -795,7 +795,7 @@ function ZeroLib:CreateWindow(config)
 
         local tabBtn = Instance.new("TextButton")
         tabBtn.Name = "Tab_" .. tabName
-        tabBtn.Size = UDim2.new(1, 0, 0, 28)
+        tabBtn.Size = UDim2.new(1, 0, 0, 30)
         tabBtn.BackgroundColor3 = theme.CardBg
         tabBtn.BackgroundTransparency = 1
         tabBtn.BorderSizePixel = 0
@@ -821,7 +821,7 @@ function ZeroLib:CreateWindow(config)
         applyFont(tabLabel, "Medium")
         tabLabel.Text = tabName
         tabLabel.TextColor3 = theme.TextMuted
-        tabLabel.TextSize = 10.5
+        tabLabel.TextSize = 12
         tabLabel.TextXAlignment = Enum.TextXAlignment.Left
         tabLabel.Parent = tabBtn
 
@@ -939,7 +939,7 @@ function ZeroLib:CreateWindow(config)
             ZeroLib:RegisterThemeObject(cardStroke, "Color", "CardStroke")
 
             local headerFrame = Instance.new("Frame")
-            headerFrame.Size = UDim2.new(1, 0, 0, 22)
+            headerFrame.Size = UDim2.new(1, 0, 0, 24)
             headerFrame.BackgroundTransparency = 1
             headerFrame.Parent = card
 
@@ -961,7 +961,7 @@ function ZeroLib:CreateWindow(config)
             applyFont(cardHeader, "Bold")
             cardHeader.Text = title
             cardHeader.TextColor3 = theme.TextMain
-            cardHeader.TextSize = 10.5
+            cardHeader.TextSize = 12.5
             cardHeader.TextXAlignment = Enum.TextXAlignment.Left
             cardHeader.Parent = headerFrame
 
@@ -1650,8 +1650,8 @@ function ZeroLib:CreateWindow(config)
                 ZeroLib:RegisterThemeObject(bStroke, "Color", "CardStroke")
 
                 btn.MouseButton1Click:Connect(function()
-                    fastTween(btn, { Size = UDim2.new(1, -2, 0, 23) }, 0.06).Completed:Connect(function()
-                        fastTween(btn, { Size = UDim2.new(1, 0, 0, 24) }, 0.06)
+                    fastTween(btn, { Size = UDim2.new(1, -2, 0, 25) }, 0.06).Completed:Connect(function()
+                        fastTween(btn, { Size = UDim2.new(1, 0, 0, 26) }, 0.06)
                     end)
                     pcall(callback)
                 end)
@@ -1677,10 +1677,10 @@ function ZeroLib:CreateWindow(config)
                 local label = Instance.new("TextLabel")
                 label.Size = UDim2.new(1, -60, 0, 14)
                 label.BackgroundTransparency = 1
-                applyFont(label, "Medium")
-                label.Text = text
-                label.TextColor3 = theme.TextMuted
-                label.TextSize = 10
+                applyFont(label, "Regular")
+        label.Text = text
+        label.TextColor3 = theme.TextMuted
+        label.TextSize = 11.5
                 label.TextXAlignment = Enum.TextXAlignment.Left
                 label.Parent = row
 
@@ -1827,10 +1827,10 @@ function ZeroLib:CreateWindow(config)
                 local label = Instance.new("TextLabel")
                 label.Size = UDim2.new(1, 0, 0, 14)
                 label.BackgroundTransparency = 1
-                applyFont(label, "Medium")
-                label.Text = text
-                label.TextColor3 = theme.TextMuted
-                label.TextSize = 10
+                applyFont(label, "Regular")
+        label.Text = text
+        label.TextColor3 = theme.TextMuted
+        label.TextSize = 11.5
                 label.TextXAlignment = Enum.TextXAlignment.Left
                 label.Parent = row
 
@@ -2108,10 +2108,10 @@ function ZeroLib:CreateWindow(config)
                 local label = Instance.new("TextLabel")
                 label.Size = UDim2.new(1, 0, 0, 14)
                 label.BackgroundTransparency = 1
-                applyFont(label, "Medium")
-                label.Text = text
-                label.TextColor3 = theme.TextMuted
-                label.TextSize = 10
+                applyFont(label, "Regular")
+        label.Text = text
+        label.TextColor3 = theme.TextMuted
+        label.TextSize = 11.5
                 label.TextXAlignment = Enum.TextXAlignment.Left
                 label.Parent = row
 
@@ -2192,10 +2192,10 @@ function ZeroLib:CreateWindow(config)
                 local label = Instance.new("TextLabel")
                 label.Size = UDim2.new(1, -30, 1, 0)
                 label.BackgroundTransparency = 1
-                applyFont(label, "Medium")
-                label.Text = text
-                label.TextColor3 = theme.TextMuted
-                label.TextSize = 10
+                applyFont(label, "Regular")
+        label.Text = text
+        label.TextColor3 = theme.TextMuted
+        label.TextSize = 11.5
                 label.TextXAlignment = Enum.TextXAlignment.Left
                 label.Parent = row
 
@@ -2233,9 +2233,9 @@ function ZeroLib:CreateWindow(config)
                 label.Size = UDim2.new(1, -50, 1, 0)
                 label.BackgroundTransparency = 1
                 applyFont(label, "Regular")
-                label.Text = text
-                label.TextColor3 = theme.TextMuted
-                label.TextSize = 10
+        label.Text = text
+        label.TextColor3 = theme.TextMuted
+        label.TextSize = 11.5
                 label.TextWrapped = true
                 label.TextXAlignment = Enum.TextXAlignment.Left
                 label.Parent = row
