@@ -2433,11 +2433,14 @@ end
 local ConfigManager = { Folder = "arcane_configs" }
 
 function ConfigManager:Init()
-    if makefolder and not isfolder(self.Folder) then makefolder(self.Folder) end
+    if makefolder and not isfolder(self.Folder) then
+        pcall(makefolder, self.Folder)
+    end
 end
 
-function ConfigManager:Save(name)
+function ConfigManager:Save(name, isSilent)
     self:Init()
+    local safeName = (name and name ~= "") and name or "default"
     local data = { Toggles = {}, Options = {} }
 
     for k, v in pairs(ZeroLib.Toggles) do
@@ -2456,55 +2459,109 @@ function ConfigManager:Save(name)
 
     local json = HttpService:JSONEncode(data)
     if writefile then
-        writefile(self.Folder .. "/" .. name .. ".json", json)
-        ZeroLib:Notify({ Title = "Config Saved", Content = "Đã lưu config: " .. name, Type = "Success" })
+        writefile(self.Folder .. "/" .. safeName .. ".json", json)
+        if not isSilent then
+            ZeroLib:Notify({ Title = "Config Saved", Content = "Đã lưu config: " .. safeName, Type = "Success" })
+        end
     end
 end
 
-function ConfigManager:Load(name)
+function ConfigManager:Load(name, isSilent)
     self:Init()
-    local path = self.Folder .. "/" .. name .. ".json"
+    local safeName = (name and name ~= "") and name or "default"
+    local path = self.Folder .. "/" .. safeName .. ".json"
     if readfile and isfile and isfile(path) then
         local json = readfile(path)
         local ok, data = pcall(HttpService.JSONDecode, HttpService, json)
         if ok and data then
             if data.Toggles then
                 for k, v in pairs(data.Toggles) do
-                    if ZeroLib.Toggles[k] then ZeroLib.Toggles[k]:SetValue(v) end
+                    if ZeroLib.Toggles[k] then
+                        pcall(function() ZeroLib.Toggles[k]:SetValue(v) end)
+                    end
                 end
             end
             if data.Options then
                 for k, v in pairs(data.Options) do
                     if ZeroLib.Options[k] then
-                        if ZeroLib.Options[k].Type == "Keybind" then
-                            local key = Enum.KeyCode[v] or Enum.KeyCode.Unknown
-                            ZeroLib.Options[k]:SetValue(key)
-                        elseif ZeroLib.Options[k].Type == "ColorPicker" then
-                            local col = Color3.fromHex(v)
-                            if col then ZeroLib.Options[k]:SetValue(col) end
-                        else
-                            ZeroLib.Options[k]:SetValue(v)
-                        end
+                        pcall(function()
+                            if ZeroLib.Options[k].Type == "Keybind" then
+                                local key = Enum.KeyCode[v] or Enum.KeyCode.Unknown
+                                ZeroLib.Options[k]:SetValue(key)
+                            elseif ZeroLib.Options[k].Type == "ColorPicker" then
+                                local col = Color3.fromHex(v)
+                                if col then ZeroLib.Options[k]:SetValue(col) end
+                            else
+                                ZeroLib.Options[k]:SetValue(v)
+                            end
+                        end)
                     end
                 end
             end
-            ZeroLib:Notify({ Title = "Config Loaded", Content = "Đã nạp config: " .. name, Type = "Success" })
+            if not isSilent then
+                ZeroLib:Notify({ Title = "Config Loaded", Content = "Đã nạp config: " .. safeName, Type = "Success" })
+            end
+            return true
         end
     else
-        ZeroLib:Notify({ Title = "Config Error", Content = "Không tìm thấy file config: " .. name, Type = "Error" })
+        if not isSilent then
+            ZeroLib:Notify({ Title = "Config Error", Content = "Không tìm thấy file config: " .. safeName .. ".json", Type = "Error" })
+        else
+            -- Tự động lưu cấu hình mặc định nếu chưa tồn tại
+            self:Save(safeName, true)
+            print("[ConfigManager] 📁 Đã tự động tạo config ban đầu: " .. safeName)
+        end
     end
+    return false
 end
 
 function ConfigManager:GetConfigs()
     self:Init()
     local list = {}
     if listfiles then
-        for _, p in ipairs(listfiles(self.Folder)) do
-            local fName = p:match("([^/\\\\]+)%.json$")
-            if fName then table.insert(list, fName) end
-        end
+        pcall(function()
+            for _, p in ipairs(listfiles(self.Folder)) do
+                local fName = p:match("([^/\\]+)%.json$")
+                if fName then table.insert(list, fName) end
+            end
+        end)
     end
     return #list > 0 and list or {"default"}
+end
+
+function ConfigManager:SetAutoLoad(name)
+    self:Init()
+    local safeName = (name and name ~= "") and name or "default"
+    
+    local path = self.Folder .. "/" .. safeName .. ".json"
+    if not (isfile and isfile(path)) then
+        self:Save(safeName, true)
+    end
+
+    if writefile then
+        writefile(self.Folder .. "/autoload.txt", safeName)
+        ZeroLib:Notify({ Title = "Auto Load Config", Content = "Đã đặt auto load cho profile: " .. safeName, Type = "Success" })
+    end
+end
+
+function ConfigManager:ClearAutoLoad()
+    self:Init()
+    if isfile and isfile(self.Folder .. "/autoload.txt") and delfile then
+        delfile(self.Folder .. "/autoload.txt")
+        ZeroLib:Notify({ Title = "Auto Load Config", Content = "Đã tắt tính năng Auto Load Config", Type = "Info" })
+    elseif writefile then
+        writefile(self.Folder .. "/autoload.txt", "")
+    end
+end
+
+function ConfigManager:GetAutoLoad()
+    self:Init()
+    local path = self.Folder .. "/autoload.txt"
+    if readfile and isfile and isfile(path) then
+        local name = readfile(path):gsub("%s+", "")
+        if #name > 0 then return name end
+    end
+    return nil
 end
 
 ZeroLib.ConfigManager = ConfigManager
