@@ -317,7 +317,13 @@ end
 function ZeroLib:InitNotifications()
     if self.Notifications then return self.Notifications end
 
-    local parentGui = (gethui and gethui()) or CoreGui or LocalPlayer:WaitForChild("PlayerGui")
+    local parentGui = (function()
+    local pgui = LocalPlayer and (LocalPlayer:FindFirstChild("PlayerGui") or LocalPlayer:WaitForChild("PlayerGui", 3))
+    if pgui then return pgui end
+    local hui = gethui and gethui()
+    if hui and not hui:IsA("ScreenGui") and not hui:IsA("GuiObject") then return hui end
+    return CoreGui or pgui
+end)()
     local notifGui = Instance.new("ScreenGui")
     notifGui.Name = "ZeroLib_Notifications"
     notifGui.ResetOnSpawn = false
@@ -455,7 +461,13 @@ end
 -- =============================================================================
 function ZeroLib:SetWatermark(gameTitle)
     local theme = self.Themes[self.ActiveTheme]
-    local parentGui = (gethui and gethui()) or CoreGui or LocalPlayer:WaitForChild("PlayerGui")
+    local parentGui = (function()
+    local pgui = LocalPlayer and (LocalPlayer:FindFirstChild("PlayerGui") or LocalPlayer:WaitForChild("PlayerGui", 3))
+    if pgui then return pgui end
+    local hui = gethui and gethui()
+    if hui and not hui:IsA("ScreenGui") and not hui:IsA("GuiObject") then return hui end
+    return CoreGui or pgui
+end)()
     gameTitle = gameTitle or "Arcane Lineage"
 
     if not self.Watermark then
@@ -541,7 +553,13 @@ end
 -- =============================================================================
 function ZeroLib:CreateWindow(config)
     local theme = self.Themes[self.ActiveTheme]
-    local parentGui = (gethui and gethui()) or CoreGui or LocalPlayer:WaitForChild("PlayerGui")
+    local parentGui = (function()
+    local pgui = LocalPlayer and (LocalPlayer:FindFirstChild("PlayerGui") or LocalPlayer:WaitForChild("PlayerGui", 3))
+    if pgui then return pgui end
+    local hui = gethui and gethui()
+    if hui and not hui:IsA("ScreenGui") and not hui:IsA("GuiObject") then return hui end
+    return CoreGui or pgui
+end)()
 
     local titleText = config.Title or "ARCANE LINEAGE"
     local subTitleText = config.SubTitle or "CRIMSON v2.6"
