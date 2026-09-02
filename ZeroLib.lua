@@ -1,13 +1,15 @@
 --[[
     ========================================================================================
-    🩸 ZEROLIB v2.6 - ULTRA-CRISP HIGH-LEGIBILITY EDITION (BUILDERSANS & GOTHAM)
+    🩸 ZEROLIB v2.7 - COMPREHENSIVE PRODUCTION ENGINE
     ========================================================================================
-    • Ultra-Legible Typography: BuilderSans / Gotham Neo-Grotesque stack (100% Crisp & Clear)
-    • Zero Glyph Boxes: Removed unprintable unicode characters; clean minimal indicators
-    • Native UIGradient ColorPicker: Full-spectrum Rainbow Hue + Dual-Layer SV Field
-    • Full Unload Functionality: Clean disconnect & memory release
-    • Dynamic Real-Time Watermark: Live FPS & Ping (ms) monitor
-    • Crisp Vector Lucide/Material Icons
+    • Full Linoria Multi-Select Dictionary Support: Options[id].Value[item] == true
+    • 1-Based Number Index Default Resolution: Default = 1 resolves to Values[1]
+    • Multi-Callback Dispatcher: Supports both initial Callback and multiple OnChanged listeners
+    • Anti-AFK Conflict Fix: Default Menu Key is Enum.KeyCode.End (no more random minimize)
+    • Live Config Manager with Dynamic Dropdown & Refresh
+    • 100% Native Gradient ColorPicker (Hue + Sat/Val + RGB + Hex)
+    • Dynamic Real-Time Watermark (FPS + Ping ms)
+    • Full Unload & Resource Cleanup
     ========================================================================================
 --]]
 
@@ -20,11 +22,10 @@ local TextService = game:GetService("TextService")
 local HttpService = game:GetService("HttpService")
 local StatsService = game:GetService("Stats")
 
-local LocalPlayer = Players.LocalPlayer
-local Mouse = LocalPlayer:GetMouse()
+local LocalPlayer = Players.LocalPlayer or Players.PlayerAdded:Wait()
 
 -- =============================================================================
--- ULTRA-CRISP TYPOGRAPHY ENGINE (BUILDERSANS & GOTHAM HYBRID)
+-- TYPOGRAPHY ENGINE (BUILDERSANS & GOTHAM HYBRID)
 -- =============================================================================
 local DevFont = {
     Title = Enum.Font.BuilderSansBold or Enum.Font.GothamBold,
@@ -52,7 +53,7 @@ local ZeroLib = {
             CardBg = Color3.fromRGB(14, 14, 18),
             CardInner = Color3.fromRGB(20, 20, 26),
             CardStroke = Color3.fromRGB(32, 32, 40),
-            Accent = Color3.fromRGB(239, 68, 68), -- Ruby Crimson
+            Accent = Color3.fromRGB(239, 68, 68),
             AccentGlow = Color3.fromRGB(185, 28, 28),
             AccentSecondary = Color3.fromRGB(244, 63, 94),
             TextMain = Color3.fromRGB(250, 250, 250),
@@ -125,7 +126,7 @@ local ZeroLib = {
     PopoverLayer = nil,
     ActivePopover = nil,
     IsVisible = true,
-    ToggleKey = Enum.KeyCode.RightControl,
+    ToggleKey = Enum.KeyCode.End,
     ThemeObjects = {},
     Connections = {},
     Font = DevFont
@@ -142,7 +143,6 @@ pcall(function() _G.ZeroLib = ZeroLib end)
 pcall(function() _G.Toggles = ZeroLib.Toggles end)
 pcall(function() _G.Options = ZeroLib.Options end)
 
--- Lucide / Material Icon Assets
 local Icons = {
     Combat = "rbxassetid://10709791437",
     Farm = "rbxassetid://10709769841",
@@ -210,8 +210,16 @@ local function makeDraggable(topbar, mainFrame)
     table.insert(ZeroLib.Connections, c3)
 end
 
+function ZeroLib:SetToggleKey(key)
+    if typeof(key) == "EnumItem" then
+        self.ToggleKey = key
+    elseif type(key) == "string" then
+        self.ToggleKey = Enum.KeyCode[key] or self.ToggleKey
+    end
+end
+
 -- =============================================================================
--- UNLOAD SYSTEM (CLEANUP ALL RESOURCES)
+-- UNLOAD SYSTEM
 -- =============================================================================
 function ZeroLib:Unload()
     print("[ZeroLib] 🧹 Đang dọn dẹp và Unload toàn bộ GUI...")
@@ -219,6 +227,8 @@ function ZeroLib:Unload()
     for _, conn in ipairs(self.Connections) do
         if typeof(conn) == "RBXScriptConnection" and conn.Connected then
             conn:Disconnect()
+        elseif type(conn) == "table" and conn.Disconnect then
+            pcall(conn.Disconnect)
         end
     end
     table.clear(self.Connections)
@@ -245,7 +255,7 @@ function ZeroLib:Unload()
 end
 
 -- =============================================================================
--- REACTIVE THEME ENGINE
+-- THEME ENGINE
 -- =============================================================================
 function ZeroLib:RegisterThemeObject(inst, prop, themeKey)
     table.insert(self.ThemeObjects, { Instance = inst, Property = prop, Key = themeKey })
@@ -312,18 +322,19 @@ function ZeroLib:SetTheme(themeName)
 end
 
 -- =============================================================================
--- NOTIFICATIONS (CRISP & CLEAN)
+-- NOTIFICATIONS
 -- =============================================================================
 function ZeroLib:InitNotifications()
     if self.Notifications then return self.Notifications end
 
     local parentGui = (function()
-    local pgui = LocalPlayer and (LocalPlayer:FindFirstChild("PlayerGui") or LocalPlayer:WaitForChild("PlayerGui", 3))
-    if pgui then return pgui end
-    local hui = gethui and gethui()
-    if hui and not hui:IsA("ScreenGui") and not hui:IsA("GuiObject") then return hui end
-    return CoreGui or pgui
-end)()
+        local pgui = LocalPlayer and (LocalPlayer:FindFirstChild("PlayerGui") or LocalPlayer:WaitForChild("PlayerGui", 3))
+        if pgui then return pgui end
+        local hui = gethui and gethui()
+        if hui and not hui:IsA("ScreenGui") and not hui:IsA("GuiObject") then return hui end
+        return CoreGui or pgui
+    end)()
+
     local notifGui = Instance.new("ScreenGui")
     notifGui.Name = "ZeroLib_Notifications"
     notifGui.ResetOnSpawn = false
@@ -457,17 +468,18 @@ function ZeroLib:Notify(data)
 end
 
 -- =============================================================================
--- REAL-TIME WATERMARK (CRISP HIGH-LEGIBILITY)
+-- REAL-TIME WATERMARK
 -- =============================================================================
 function ZeroLib:SetWatermark(gameTitle)
     local theme = self.Themes[self.ActiveTheme]
     local parentGui = (function()
-    local pgui = LocalPlayer and (LocalPlayer:FindFirstChild("PlayerGui") or LocalPlayer:WaitForChild("PlayerGui", 3))
-    if pgui then return pgui end
-    local hui = gethui and gethui()
-    if hui and not hui:IsA("ScreenGui") and not hui:IsA("GuiObject") then return hui end
-    return CoreGui or pgui
-end)()
+        local pgui = LocalPlayer and (LocalPlayer:FindFirstChild("PlayerGui") or LocalPlayer:WaitForChild("PlayerGui", 3))
+        if pgui then return pgui end
+        local hui = gethui and gethui()
+        if hui and not hui:IsA("ScreenGui") and not hui:IsA("GuiObject") then return hui end
+        return CoreGui or pgui
+    end)()
+
     gameTitle = gameTitle or "Arcane Lineage"
 
     if not self.Watermark then
@@ -554,17 +566,17 @@ end
 function ZeroLib:CreateWindow(config)
     local theme = self.Themes[self.ActiveTheme]
     local parentGui = (function()
-    local pgui = LocalPlayer and (LocalPlayer:FindFirstChild("PlayerGui") or LocalPlayer:WaitForChild("PlayerGui", 3))
-    if pgui then return pgui end
-    local hui = gethui and gethui()
-    if hui and not hui:IsA("ScreenGui") and not hui:IsA("GuiObject") then return hui end
-    return CoreGui or pgui
-end)()
+        local pgui = LocalPlayer and (LocalPlayer:FindFirstChild("PlayerGui") or LocalPlayer:WaitForChild("PlayerGui", 3))
+        if pgui then return pgui end
+        local hui = gethui and gethui()
+        if hui and not hui:IsA("ScreenGui") and not hui:IsA("GuiObject") then return hui end
+        return CoreGui or pgui
+    end)()
 
     local titleText = config.Title or "ARCANE LINEAGE"
-    local subTitleText = config.SubTitle or "CRIMSON v2.6"
+    local subTitleText = config.SubTitle or "CRIMSON v2.7"
     local windowSize = config.Size or UDim2.new(0, 560, 0, 400)
-    local toggleKey = config.ToggleKey or Enum.KeyCode.RightControl
+    local toggleKey = config.ToggleKey or Enum.KeyCode.End
     ZeroLib.ToggleKey = toggleKey
 
     local screenGui = Instance.new("ScreenGui")
@@ -739,8 +751,9 @@ end)()
         mainShell.Visible = ZeroLib.IsVisible
     end)
 
+    -- Toggle GUI Key Listener (Strict check to prevent false AFK pulses)
     local keyConn = UserInputService.InputBegan:Connect(function(input, gpe)
-        if not gpe and input.KeyCode == ZeroLib.ToggleKey then
+        if not gpe and input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == ZeroLib.ToggleKey then
             ZeroLib.IsVisible = not ZeroLib.IsVisible
             mainShell.Visible = ZeroLib.IsVisible
         end
@@ -875,7 +888,7 @@ end)()
         rightColumn.Size = UDim2.new(0.5, -4, 1, 0)
         rightColumn.Position = UDim2.new(0.5, 4, 0, 0)
         rightColumn.BackgroundTransparency = 1
-        rightColumn.Parent = tabPage
+        rightColumn.Parent = rightColumn
 
         local rightLayout = Instance.new("UIListLayout")
         rightLayout.Padding = UDim.new(0, 6)
@@ -925,7 +938,7 @@ end)()
             Tab:Select()
         end)
 
-        -- GROUPBOX BUILDER (CLEAN & MINIMAL)
+        -- GROUPBOX BUILDER
         local function createGroupbox(parentCol, title)
             local card = Instance.new("Frame")
             card.Name = "Group_" .. title
@@ -1002,9 +1015,13 @@ end)()
 
             local Group = { Card = card, Container = container }
 
-            -- =========================================================================
-            -- 100% NATIVE UIGRADIENT PRO COLORPICKER
-            -- =========================================================================
+            function Group:Resize()
+                pcall(function()
+                    card.Size = UDim2.new(1, 0, 0, cLayout.AbsoluteContentSize.Y + 34)
+                end)
+            end
+
+            -- 100% NATIVE PRO COLORPICKER
             local function createProColorPicker(cpId, defaultColor, callback, anchorButton)
                 local curColor = defaultColor or Color3.fromRGB(239, 68, 68)
                 local h, s, v = curColor:ToHSV()
@@ -1249,7 +1266,7 @@ end)()
                     S = s,
                     V = v,
                     IsOpen = false,
-                    Callback = callback,
+                    Callbacks = callback and { callback } or {},
                     Type = "ColorPicker"
                 }
 
@@ -1272,13 +1289,19 @@ end)()
                     gBox.Text = tostring(math.floor(finalColor.G * 255))
                     bBox.Text = tostring(math.floor(finalColor.B * 255))
 
-                    pcall(ColorObj.Callback, finalColor)
+                    for _, cb in ipairs(ColorObj.Callbacks) do
+                        pcall(cb, finalColor)
+                    end
                 end
 
                 function ColorObj:SetValue(col)
                     self.Value = col
                     local nh, ns, nv = col:ToHSV()
                     updateColor(nh, ns, nv)
+                end
+
+                function ColorObj:OnChanged(fn)
+                    table.insert(self.Callbacks, fn)
                 end
 
                 function ColorObj:TogglePicker(open)
@@ -1311,7 +1334,6 @@ end)()
                     end
                 end
 
-                -- Interactive Dragging for Saturation / Value Field
                 local slidingSV = false
                 local svBtn = Instance.new("TextButton")
                 svBtn.Size = UDim2.new(1, 0, 1, 0)
@@ -1329,7 +1351,6 @@ end)()
                     end
                 end)
 
-                -- Interactive Dragging for Rainbow Hue Bar
                 local slidingHue = false
                 local hueBtn = Instance.new("TextButton")
                 hueBtn.Size = UDim2.new(1, 0, 1, 0)
@@ -1366,7 +1387,6 @@ end)()
                 end)
                 table.insert(ZeroLib.Connections, moveConn)
 
-                -- Hex Input parsing
                 hexInput.FocusLost:Connect(function()
                     local raw = hexInput.Text:gsub("#", "")
                     local ok, col = pcall(Color3.fromHex, raw)
@@ -1375,7 +1395,6 @@ end)()
                     end
                 end)
 
-                -- RGB Inputs parsing
                 local function parseRgb()
                     local r = math.clamp(tonumber(rBox.Text) or 0, 0, 255) / 255
                     local g = math.clamp(tonumber(gBox.Text) or 0, 0, 255) / 255
@@ -1395,11 +1414,11 @@ end)()
                 return ColorObj
             end
 
-            -- 1. TOGGLE COMPONENT (CRISP TYPOGRAPHY)
+            -- 1. TOGGLE COMPONENT
             function Group:AddToggle(id, toggleConfig)
                 local text = toggleConfig.Text or id
                 local default = toggleConfig.Default or false
-                local callback = toggleConfig.Callback or function() end
+                local callback = toggleConfig.Callback
 
                 local row = Instance.new("Frame")
                 row.Size = UDim2.new(1, 0, 0, 20)
@@ -1453,7 +1472,7 @@ end)()
 
                 local ToggleObj = {
                     Value = default,
-                    Callback = callback,
+                    Callbacks = callback and { callback } or {},
                     Type = "Toggle"
                 }
 
@@ -1469,10 +1488,14 @@ end)()
                 function ToggleObj:SetValue(val)
                     self.Value = val
                     self:UpdateVisuals()
-                    pcall(self.Callback, val)
+                    for _, fn in ipairs(self.Callbacks) do
+                        pcall(fn, val)
+                    end
                 end
 
-                function ToggleObj:OnChanged(fn) self.Callback = fn end
+                function ToggleObj:OnChanged(fn)
+                    table.insert(self.Callbacks, fn)
+                end
 
                 switch.MouseButton1Click:Connect(function()
                     ToggleObj:SetValue(not ToggleObj.Value)
@@ -1490,7 +1513,7 @@ end)()
                     end
 
                     local kbMode = kbConfig.Mode or "Toggle"
-                    local kbCallback = kbConfig.Callback or function() end
+                    local kbCallback = kbConfig.Callback
 
                     local kbBtn = Instance.new("TextButton")
                     kbBtn.Size = UDim2.new(0, 36, 0, 15)
@@ -1519,8 +1542,25 @@ end)()
                         Value = kbDefault,
                         Mode = kbMode,
                         Binding = false,
+                        Callbacks = kbCallback and { kbCallback } or {},
                         Type = "Keybind"
                     }
+
+                    function KeybindObj:OnChanged(fn)
+                        table.insert(self.Callbacks, fn)
+                    end
+
+                    function KeybindObj:SetValue(key)
+                        if typeof(key) == "EnumItem" then
+                            self.Value = key
+                        elseif type(key) == "string" then
+                            self.Value = Enum.KeyCode[key] or Enum.KeyCode.Unknown
+                        end
+                        kbBtn.Text = self.Value.Name ~= "Unknown" and self.Value.Name or "NONE"
+                        for _, fn in ipairs(self.Callbacks) do
+                            pcall(fn, self.Value)
+                        end
+                    end
 
                     kbBtn.MouseButton1Click:Connect(function()
                         KeybindObj.Binding = true
@@ -1533,11 +1573,9 @@ end)()
                             if input.UserInputType == Enum.UserInputType.Keyboard then
                                 KeybindObj.Binding = false
                                 if input.KeyCode == Enum.KeyCode.Escape then
-                                    KeybindObj.Value = Enum.KeyCode.Unknown
-                                    kbBtn.Text = "NONE"
+                                    KeybindObj:SetValue(Enum.KeyCode.Unknown)
                                 else
-                                    KeybindObj.Value = input.KeyCode
-                                    kbBtn.Text = input.KeyCode.Name
+                                    KeybindObj:SetValue(input.KeyCode)
                                 end
                                 kbBtn.TextColor3 = ZeroLib.Themes[ZeroLib.ActiveTheme].TextMuted
                             end
@@ -1547,7 +1585,9 @@ end)()
                             elseif KeybindObj.Mode == "Hold" then
                                 ToggleObj:SetValue(true)
                             end
-                            pcall(kbCallback, ToggleObj.Value)
+                            for _, fn in ipairs(KeybindObj.Callbacks) do
+                                pcall(fn, ToggleObj.Value)
+                            end
                         end
                     end)
                     table.insert(ZeroLib.Connections, kbConn)
@@ -1562,12 +1602,13 @@ end)()
                     ZeroLib.Options[kbId or (id .. "_Keybind")] = KeybindObj
                     return KeybindObj
                 end
+
                 ToggleObj.AddKeyPicker = ToggleObj.AddKeybind
 
                 -- INLINE PRO COLORPICKER
                 function ToggleObj:AddColorPicker(cpId, cpConfig)
                     local cpDefault = cpConfig.Default or Color3.fromRGB(239, 68, 68)
-                    local cpCallback = cpConfig.Callback or function() end
+                    local cpCallback = cpConfig.Callback
 
                     local colorBox = Instance.new("TextButton")
                     colorBox.Size = UDim2.new(0, 16, 0, 15)
@@ -1595,7 +1636,7 @@ end)()
                 return ToggleObj
             end
 
-            -- 2. BUTTON COMPONENT (CLEAN MODERN)
+            -- 2. BUTTON COMPONENT
             function Group:AddButton(btnConfig, callbackArg)
                 local text, callback
                 if type(btnConfig) == "table" then
@@ -1639,7 +1680,7 @@ end)()
                 return btn
             end
 
-            -- 3. SLIDER COMPONENT (CRISP SANS)
+            -- 3. SLIDER COMPONENT
             function Group:AddSlider(id, sliderConfig)
                 local text = sliderConfig.Text or id
                 local min = sliderConfig.Min or 0
@@ -1647,7 +1688,7 @@ end)()
                 local default = sliderConfig.Default or min
                 local rounding = sliderConfig.Rounding or 0
                 local suffix = sliderConfig.Suffix or ""
-                local callback = sliderConfig.Callback or function() end
+                local callback = sliderConfig.Callback
 
                 local row = Instance.new("Frame")
                 row.Size = UDim2.new(1, 0, 0, 30)
@@ -1705,7 +1746,7 @@ end)()
 
                 local SliderObj = {
                     Value = default,
-                    Callback = callback,
+                    Callbacks = callback and { callback } or {},
                     Type = "Slider"
                 }
 
@@ -1722,7 +1763,9 @@ end)()
                     SliderObj.Value = finalVal
                     fill.Size = UDim2.new(percent, 0, 1, 0)
                     valLabel.Text = tostring(finalVal) .. suffix
-                    pcall(SliderObj.Callback, finalVal)
+                    for _, fn in ipairs(SliderObj.Callbacks) do
+                        pcall(fn, finalVal)
+                    end
                 end
 
                 function SliderObj:SetValue(val)
@@ -1731,10 +1774,14 @@ end)()
                     local percent = math.clamp((val - min) / (max - min), 0, 1)
                     fill.Size = UDim2.new(percent, 0, 1, 0)
                     valLabel.Text = tostring(val) .. suffix
-                    pcall(self.Callback, val)
+                    for _, fn in ipairs(self.Callbacks) do
+                        pcall(fn, val)
+                    end
                 end
 
-                function SliderObj:OnChanged(fn) self.Callback = fn end
+                function SliderObj:OnChanged(fn)
+                    table.insert(self.Callbacks, fn)
+                end
 
                 local sliding = false
                 sliderBar.InputBegan:Connect(function(input)
@@ -1760,13 +1807,38 @@ end)()
                 return SliderObj
             end
 
-            -- 4. DROPDOWN COMPONENT (CRISP SANS)
+            -- 4. DROPDOWN COMPONENT (FULL DICTIONARY & INDEX RESOLUTION SUPPORT)
             function Group:AddDropdown(id, dropConfig)
                 local text = dropConfig.Text or id
                 local values = dropConfig.Values or {}
                 local isMulti = dropConfig.Multi or false
-                local default = dropConfig.Default or (isMulti and {} or (values[1] or ""))
-                local callback = dropConfig.Callback or function() end
+                local rawDefault = dropConfig.Default
+                local callback = dropConfig.Callback
+
+                -- 1. Resolve Initial Value
+                local initialValue
+                if isMulti then
+                    initialValue = {}
+                    if type(rawDefault) == "table" then
+                        for k, v in pairs(rawDefault) do
+                            if type(k) == "number" and type(v) == "string" then
+                                initialValue[v] = true
+                            elseif type(k) == "string" and v == true then
+                                initialValue[k] = true
+                            end
+                        end
+                    elseif type(rawDefault) == "string" then
+                        initialValue[rawDefault] = true
+                    end
+                else
+                    if type(rawDefault) == "number" then
+                        initialValue = values[rawDefault] or values[1] or ""
+                    elseif type(rawDefault) == "string" then
+                        initialValue = rawDefault
+                    else
+                        initialValue = values[1] or ""
+                    end
+                end
 
                 local row = Instance.new("Frame")
                 row.Size = UDim2.new(1, 0, 0, 38)
@@ -1783,13 +1855,27 @@ end)()
                 label.TextXAlignment = Enum.TextXAlignment.Left
                 label.Parent = row
 
+                local function getDisplayText(val)
+                    if isMulti then
+                        local selected = {}
+                        for _, item in ipairs(values) do
+                            if val and val[item] == true then
+                                table.insert(selected, item)
+                            end
+                        end
+                        return #selected > 0 and table.concat(selected, ", ") or "None selected"
+                    else
+                        return tostring(val or "")
+                    end
+                end
+
                 local dropBtn = Instance.new("TextButton")
                 dropBtn.Size = UDim2.new(1, 0, 0, 22)
                 dropBtn.Position = UDim2.new(0, 0, 0, 16)
                 dropBtn.BackgroundColor3 = theme.CardInner
                 dropBtn.BorderSizePixel = 0
                 applyFont(dropBtn, "Medium")
-                dropBtn.Text = "  " .. (isMulti and table.concat(default, ", ") or tostring(default))
+                dropBtn.Text = "  " .. getDisplayText(initialValue)
                 dropBtn.TextColor3 = theme.TextMain
                 dropBtn.TextSize = 10
                 dropBtn.TextXAlignment = Enum.TextXAlignment.Left
@@ -1845,20 +1931,20 @@ end)()
                 mLayout.Parent = dropMenu
 
                 local DropObj = {
-                    Value = default,
+                    Value = initialValue,
                     Values = values,
                     Multi = isMulti,
-                    Callback = callback,
+                    Callbacks = callback and { callback } or {},
                     IsOpen = false,
                     LastCloseTime = 0,
                     Type = "Dropdown"
                 }
 
-                local function isSelected(val)
+                local function isItemSelected(valName)
                     if isMulti then
-                        return table.find(DropObj.Value, val) ~= nil
+                        return DropObj.Value and DropObj.Value[valName] == true
                     else
-                        return DropObj.Value == val
+                        return DropObj.Value == valName
                     end
                 end
 
@@ -1869,7 +1955,7 @@ end)()
                     end
 
                     for _, v in ipairs(DropObj.Values) do
-                        local selected = isSelected(v)
+                        local selected = isItemSelected(v)
                         local itemBtn = Instance.new("TextButton")
                         itemBtn.Size = UDim2.new(1, -4, 0, 20)
                         itemBtn.Position = UDim2.new(0, 2, 0, 0)
@@ -1890,11 +1976,11 @@ end)()
 
                         itemBtn.MouseButton1Click:Connect(function()
                             if isMulti then
-                                local idx = table.find(DropObj.Value, v)
-                                if idx then
-                                    table.remove(DropObj.Value, idx)
+                                if not DropObj.Value then DropObj.Value = {} end
+                                if DropObj.Value[v] == true then
+                                    DropObj.Value[v] = nil
                                 else
-                                    table.insert(DropObj.Value, v)
+                                    DropObj.Value[v] = true
                                 end
                                 DropObj:SetValue(DropObj.Value)
                                 rebuildMenu()
@@ -1922,7 +2008,7 @@ end)()
 
                         self.IsOpen = true
                         rebuildMenu()
-                        dropMenu.Position = UDim2.new(0, absPos.X, 0, absPos.Y + absSize.Y - 4)
+                        dropMenu.Position = UDim2.new(0, absPos.X, 0, absPos.Y - 4)
                         dropMenu.Size = UDim2.new(0, absSize.X, 0, 0)
                         dropMenu.BackgroundTransparency = 0.4
                         dropMenu.Visible = true
@@ -1946,7 +2032,7 @@ end)()
                         tween(arrow, TweenInfo.new(0.16, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Rotation = 0 })
                         local closeTw = tween(dropMenu, TweenInfo.new(0.16, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
                             Size = UDim2.new(0, absSize.X, 0, 0),
-                            Position = UDim2.new(0, absPos.X, 0, absPos.Y + absSize.Y - 3),
+                            Position = UDim2.new(0, absPos.X, 0, absPos.Y - 3),
                             BackgroundTransparency = 0.5
                         })
 
@@ -1971,18 +2057,37 @@ end)()
                 end
 
                 function DropObj:SetValue(val)
-                    self.Value = val
-                    if isMulti then
-                        dropBtn.Text = "  " .. (#val > 0 and table.concat(val, ", ") or "None selected")
+                    if self.Multi then
+                        if type(val) == "table" then
+                            local dict = {}
+                            for k, v in pairs(val) do
+                                if type(k) == "number" and type(v) == "string" then
+                                    dict[v] = true
+                                elseif type(k) == "string" and v == true then
+                                    dict[k] = true
+                                end
+                            end
+                            self.Value = dict
+                        elseif type(val) == "string" then
+                            self.Value = { [val] = true }
+                        end
                     else
-                        dropBtn.Text = "  " .. tostring(val)
+                        if type(val) == "number" then
+                            self.Value = self.Values[val] or self.Values[1] or ""
+                        else
+                            self.Value = val
+                        end
                     end
-                    pcall(self.Callback, val)
+
+                    dropBtn.Text = "  " .. getDisplayText(self.Value)
+                    for _, fn in ipairs(self.Callbacks) do
+                        pcall(fn, self.Value)
+                    end
                 end
 
                 function DropObj:SetValues(newVals)
                     self.Values = newVals
-                    if isMulti then
+                    if self.Multi then
                         self.Value = {}
                         self:SetValue({})
                     else
@@ -1990,9 +2095,12 @@ end)()
                             self:SetValue(newVals[1] or "")
                         end
                     end
+                    rebuildMenu()
                 end
 
-                function DropObj:OnChanged(fn) self.Callback = fn end
+                function DropObj:OnChanged(fn)
+                    table.insert(self.Callbacks, fn)
+                end
 
                 dropBtn.MouseButton1Click:Connect(function()
                     if DropObj.IsOpen then
@@ -2006,12 +2114,12 @@ end)()
                 return DropObj
             end
 
-            -- 5. COMPACT INPUT (CRISP SANS)
+            -- 5. COMPACT INPUT
             function Group:AddInput(id, inputConfig)
                 local text = inputConfig.Text or id
                 local default = inputConfig.Default or ""
                 local placeholder = inputConfig.Placeholder or "Type here..."
-                local callback = inputConfig.Callback or function() end
+                local callback = inputConfig.Callback
 
                 local row = Instance.new("Frame")
                 row.Size = UDim2.new(1, 0, 0, 38)
@@ -2064,32 +2172,38 @@ end)()
 
                 local InputObj = {
                     Value = default,
-                    Callback = callback,
+                    Callbacks = callback and { callback } or {},
                     Type = "Input"
                 }
 
                 function InputObj:SetValue(val)
                     self.Value = val
                     textBox.Text = tostring(val)
-                    pcall(self.Callback, val)
+                    for _, fn in ipairs(self.Callbacks) do
+                        pcall(fn, val)
+                    end
                 end
 
-                function InputObj:OnChanged(fn) self.Callback = fn end
+                function InputObj:OnChanged(fn)
+                    table.insert(self.Callbacks, fn)
+                end
 
                 textBox.FocusLost:Connect(function()
                     InputObj.Value = textBox.Text
-                    pcall(InputObj.Callback, textBox.Text)
+                    for _, fn in ipairs(InputObj.Callbacks) do
+                        pcall(fn, textBox.Text)
+                    end
                 end)
 
                 ZeroLib.Options[id] = InputObj
                 return InputObj
             end
 
-            -- 6. STANDALONE PRO COLORPICKER
+            -- 6. STANDALONE COLORPICKER
             function Group:AddColorPicker(id, cpConfig)
                 local text = cpConfig.Text or id
                 local defaultColor = cpConfig.Default or Color3.fromRGB(239, 68, 68)
-                local callback = cpConfig.Callback or function() end
+                local callback = cpConfig.Callback
 
                 local row = Instance.new("Frame")
                 row.Size = UDim2.new(1, 0, 0, 22)
@@ -2184,7 +2298,7 @@ end)()
                     end
 
                     local kbMode = kbConfig.Mode or "Toggle"
-                    local kbCallback = kbConfig.Callback or function() end
+                    local kbCallback = kbConfig.Callback
 
                     local kbBtn = Instance.new("TextButton")
                     kbBtn.Size = UDim2.new(0, 36, 0, 15)
@@ -2212,8 +2326,25 @@ end)()
                         Value = kbDefault,
                         Mode = kbMode,
                         Binding = false,
+                        Callbacks = kbCallback and { kbCallback } or {},
                         Type = "Keybind"
                     }
+
+                    function KeybindObj:OnChanged(fn)
+                        table.insert(self.Callbacks, fn)
+                    end
+
+                    function KeybindObj:SetValue(key)
+                        if typeof(key) == "EnumItem" then
+                            self.Value = key
+                        elseif type(key) == "string" then
+                            self.Value = Enum.KeyCode[key] or Enum.KeyCode.Unknown
+                        end
+                        kbBtn.Text = self.Value.Name ~= "Unknown" and self.Value.Name or "NONE"
+                        for _, fn in ipairs(self.Callbacks) do
+                            pcall(fn, self.Value)
+                        end
+                    end
 
                     kbBtn.MouseButton1Click:Connect(function()
                         KeybindObj.Binding = true
@@ -2226,16 +2357,16 @@ end)()
                             if input.UserInputType == Enum.UserInputType.Keyboard then
                                 KeybindObj.Binding = false
                                 if input.KeyCode == Enum.KeyCode.Escape then
-                                    KeybindObj.Value = Enum.KeyCode.Unknown
-                                    kbBtn.Text = "NONE"
+                                    KeybindObj:SetValue(Enum.KeyCode.Unknown)
                                 else
-                                    KeybindObj.Value = input.KeyCode
-                                    kbBtn.Text = input.KeyCode.Name
+                                    KeybindObj:SetValue(input.KeyCode)
                                 end
                                 kbBtn.TextColor3 = ZeroLib.Themes[ZeroLib.ActiveTheme].TextMuted
                             end
                         elseif not gpe and input.KeyCode == KeybindObj.Value and KeybindObj.Value ~= Enum.KeyCode.Unknown then
-                            pcall(kbCallback, KeybindObj.Value)
+                            for _, fn in ipairs(KeybindObj.Callbacks) do
+                                pcall(fn, KeybindObj.Value)
+                            end
                         end
                     end)
                     table.insert(ZeroLib.Connections, kbConn)
@@ -2248,7 +2379,7 @@ end)()
 
                 function LabelObj:AddColorPicker(cpId, cpConfig)
                     local cpDefault = cpConfig.Default or Color3.fromRGB(239, 68, 68)
-                    local cpCallback = cpConfig.Callback or function() end
+                    local cpCallback = cpConfig.Callback
 
                     local colorBox = Instance.new("TextButton")
                     colorBox.Size = UDim2.new(0, 16, 0, 15)
@@ -2292,12 +2423,6 @@ end)()
 
                 ZeroLib:RegisterThemeObject(div, "BackgroundColor3", "CardStroke")
                 return div
-            end
-
-                        function Group:Resize()
-                pcall(function()
-                    card.Size = UDim2.new(1, 0, 0, cLayout.AbsoluteContentSize.Y + 34)
-                end)
             end
 
             return Group
@@ -2374,7 +2499,7 @@ function ConfigManager:Load(name)
                     if ZeroLib.Options[k] then
                         if ZeroLib.Options[k].Type == "Keybind" then
                             local key = Enum.KeyCode[v] or Enum.KeyCode.Unknown
-                            ZeroLib.Options[k].Value = key
+                            ZeroLib.Options[k]:SetValue(key)
                         elseif ZeroLib.Options[k].Type == "ColorPicker" then
                             local col = Color3.fromHex(v)
                             if col then ZeroLib.Options[k]:SetValue(col) end
@@ -2396,7 +2521,7 @@ function ConfigManager:GetConfigs()
     local list = {}
     if listfiles then
         for _, p in ipairs(listfiles(self.Folder)) do
-            local fName = p:match("([^/\\]+)%.json$")
+            local fName = p:match("([^/\\\\]+)%.json$")
             if fName then table.insert(list, fName) end
         end
     end
