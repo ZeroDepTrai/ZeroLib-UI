@@ -1478,9 +1478,17 @@ end)()
                     ToggleObj:SetValue(not ToggleObj.Value)
                 end)
 
-                -- INLINE KEYBIND
+                -- INLINE KEYBIND & KEYPICKER
                 function ToggleObj:AddKeybind(kbId, kbConfig)
-                    local kbDefault = kbConfig.Default or Enum.KeyCode.Unknown
+                    kbConfig = kbConfig or {}
+                    local rawDefault = kbConfig.Default
+                    local kbDefault = Enum.KeyCode.Unknown
+                    if typeof(rawDefault) == "EnumItem" then
+                        kbDefault = rawDefault
+                    elseif type(rawDefault) == "string" then
+                        kbDefault = Enum.KeyCode[rawDefault] or Enum.KeyCode.Unknown
+                    end
+
                     local kbMode = kbConfig.Mode or "Toggle"
                     local kbCallback = kbConfig.Callback or function() end
 
@@ -1554,6 +1562,7 @@ end)()
                     ZeroLib.Options[kbId or (id .. "_Keybind")] = KeybindObj
                     return KeybindObj
                 end
+                ToggleObj.AddKeyPicker = ToggleObj.AddKeybind
 
                 -- INLINE PRO COLORPICKER
                 function ToggleObj:AddColorPicker(cpId, cpConfig)
