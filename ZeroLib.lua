@@ -224,7 +224,7 @@ end
 -- UNLOAD SYSTEM
 -- =============================================================================
 function ZeroLib:Unload()
-    print("[ZeroLib] 🧹 Đang dọn dẹp và Unload toàn bộ GUI...")
+    print("[ZeroLib] 🧹 Cleaning up and unloading GUI...")
 
     for _, conn in ipairs(self.Connections) do
         if typeof(conn) == "RBXScriptConnection" and conn.Connected then
@@ -253,7 +253,7 @@ function ZeroLib:Unload()
     self.Notifications = nil
 
     getgenv().ZeroLib = nil
-    print("[ZeroLib] ✨ Đã Unload hoàn tất!")
+    print("[ZeroLib] ✨ Unloaded successfully!")
 end
 
 -- =============================================================================
