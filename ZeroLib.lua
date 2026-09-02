@@ -115,7 +115,7 @@ local ZeroLib = {
             Danger = Color3.fromRGB(239, 68, 68),
         }
     },
-    ActiveTheme = "Crimson",
+    ActiveTheme = "CyberCyan",
     Toggles = {},
     Options = {},
     Flags = {},
@@ -144,13 +144,15 @@ pcall(function() _G.Toggles = ZeroLib.Toggles end)
 pcall(function() _G.Options = ZeroLib.Options end)
 
 local Icons = {
-    Combat = "rbxassetid://10709791437",
-    Farm = "rbxassetid://10709769841",
-    World = "rbxassetid://10709775082",
-    Settings = "rbxassetid://10709775704",
-    Player = "rbxassetid://10709770560",
-    Visuals = "rbxassetid://10709774577",
-    Terminal = "rbxassetid://10709790948",
+    Combat = "rbxassetid://10734975692",   -- Material Symbols: Swords
+    Farm = "rbxassetid://10723405364",     -- Material Symbols: Sprout / Leaf
+    World = "rbxassetid://10723415903",    -- Material Symbols: Globe
+    Teleport = "rbxassetid://10723415903", -- Material Symbols: Globe / Portal
+    Settings = "rbxassetid://10734950309", -- Material Symbols: Sliders
+    Player = "rbxassetid://10747373176",   -- Material Symbols: Zap / Speed
+    Movement = "rbxassetid://10747373176", -- Material Symbols: Zap / Speed
+    Visuals = "rbxassetid://10723415205",  -- Material Symbols: Eye
+    Terminal = "rbxassetid://10734950020", -- Material Symbols: Terminal
     Dot = "rbxassetid://10709773823"
 }
 ZeroLib.Icons = Icons
@@ -679,31 +681,8 @@ function ZeroLib:CreateWindow(config)
     titleLabel.TextXAlignment = Enum.TextXAlignment.Left
     titleLabel.Parent = topbar
 
-    local versionBadge = Instance.new("TextLabel")
-    versionBadge.Size = UDim2.new(0, 74, 0, 18)
-    versionBadge.Position = UDim2.new(0, 175, 0.5, -9)
-    versionBadge.BackgroundColor3 = theme.CardInner
-    versionBadge.BorderSizePixel = 0
-    applyFont(versionBadge, "Bold")
-    versionBadge.Text = subTitleText
-    versionBadge.TextColor3 = theme.Accent
-    versionBadge.TextSize = 9
-    versionBadge.Parent = topbar
-
-    local badgeCorner = Instance.new("UICorner")
-    badgeCorner.CornerRadius = UDim.new(0, 3)
-    badgeCorner.Parent = versionBadge
-
-    local badgeStroke = Instance.new("UIStroke")
-    badgeStroke.Color = theme.AccentGlow
-    badgeStroke.Thickness = 1
-    badgeStroke.Parent = versionBadge
-
     ZeroLib:RegisterThemeObject(titleIcon, "ImageColor3", "Accent")
     ZeroLib:RegisterThemeObject(titleLabel, "TextColor3", "TextMain")
-    ZeroLib:RegisterThemeObject(versionBadge, "BackgroundColor3", "CardInner")
-    ZeroLib:RegisterThemeObject(versionBadge, "TextColor3", "Accent")
-    ZeroLib:RegisterThemeObject(badgeStroke, "Color", "AccentGlow")
 
     -- Topbar Buttons (Minimize & Full UNLOAD Button)
     local controlsFrame = Instance.new("Frame")
