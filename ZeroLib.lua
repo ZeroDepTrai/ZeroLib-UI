@@ -577,7 +577,7 @@ function ZeroLib:CreateWindow(config)
 
     local titleText = config.Title or "ARCANE LINEAGE"
     local subTitleText = config.SubTitle or "CRIMSON v2.7"
-    local windowSize = config.Size or UDim2.new(0, 560, 0, 400)
+    local windowSize = config.Size or UDim2.new(0, 680, 0, 480)
     local toggleKey = config.ToggleKey or Enum.KeyCode.End
     ZeroLib.ToggleKey = toggleKey
 
