@@ -2129,10 +2129,15 @@ end)()
                 return createProColorPicker(id, defaultColor, callback, colorBox)
             end
 
-            -- 7. LABEL & DIVIDER
+            -- 7. LABEL & DIVIDER (WITH INLINE KEYPICKER / COLORPICKER SUPPORT)
             function Group:AddLabel(text)
+                local row = Instance.new("Frame")
+                row.Size = UDim2.new(1, 0, 0, 18)
+                row.BackgroundTransparency = 1
+                row.Parent = container
+
                 local label = Instance.new("TextLabel")
-                label.Size = UDim2.new(1, 0, 0, 16)
+                label.Size = UDim2.new(1, -50, 1, 0)
                 label.BackgroundTransparency = 1
                 applyFont(label, "Regular")
                 label.Text = text
@@ -2140,10 +2145,142 @@ end)()
                 label.TextSize = 10
                 label.TextWrapped = true
                 label.TextXAlignment = Enum.TextXAlignment.Left
-                label.Parent = container
+                label.Parent = row
 
                 ZeroLib:RegisterThemeObject(label, "TextColor3", "TextMuted")
-                return label
+
+                local subContainer = Instance.new("Frame")
+                subContainer.Size = UDim2.new(0, 50, 1, 0)
+                subContainer.Position = UDim2.new(1, -50, 0, 0)
+                subContainer.BackgroundTransparency = 1
+                subContainer.Parent = row
+
+                local subLayout = Instance.new("UIListLayout")
+                subLayout.FillDirection = Enum.FillDirection.Horizontal
+                subLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
+                subLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+                subLayout.Padding = UDim.new(0, 4)
+                subLayout.Parent = subContainer
+
+                local LabelObj = {
+                    Instance = label,
+                    Row = row,
+                    Text = text
+                }
+
+                function LabelObj:SetText(newTxt)
+                    self.Text = newTxt
+                    label.Text = newTxt
+                end
+
+                function LabelObj:AddKeybind(kbId, kbConfig)
+                    kbConfig = kbConfig or {}
+                    local rawDefault = kbConfig.Default
+                    local kbDefault = Enum.KeyCode.Unknown
+                    if typeof(rawDefault) == "EnumItem" then
+                        kbDefault = rawDefault
+                    elseif type(rawDefault) == "string" then
+                        kbDefault = Enum.KeyCode[rawDefault] or Enum.KeyCode.Unknown
+                    end
+
+                    local kbMode = kbConfig.Mode or "Toggle"
+                    local kbCallback = kbConfig.Callback or function() end
+
+                    local kbBtn = Instance.new("TextButton")
+                    kbBtn.Size = UDim2.new(0, 36, 0, 15)
+                    kbBtn.BackgroundColor3 = theme.CardInner
+                    kbBtn.BorderSizePixel = 0
+                    applyFont(kbBtn, "Bold")
+                    kbBtn.Text = kbDefault.Name ~= "Unknown" and kbDefault.Name or "NONE"
+                    kbBtn.TextColor3 = theme.TextMuted
+                    kbBtn.TextSize = 8.5
+                    kbBtn.Parent = subContainer
+
+                    local kCorner = Instance.new("UICorner")
+                    kCorner.CornerRadius = UDim.new(0, 3)
+                    kCorner.Parent = kbBtn
+
+                    local kStroke = Instance.new("UIStroke")
+                    kStroke.Color = theme.CardStroke
+                    kStroke.Thickness = 1
+                    kStroke.Parent = kbBtn
+
+                    ZeroLib:RegisterThemeObject(kbBtn, "BackgroundColor3", "CardInner")
+                    ZeroLib:RegisterThemeObject(kStroke, "Color", "CardStroke")
+
+                    local KeybindObj = {
+                        Value = kbDefault,
+                        Mode = kbMode,
+                        Binding = false,
+                        Type = "Keybind"
+                    }
+
+                    kbBtn.MouseButton1Click:Connect(function()
+                        KeybindObj.Binding = true
+                        kbBtn.Text = "..."
+                        kbBtn.TextColor3 = ZeroLib.Themes[ZeroLib.ActiveTheme].Accent
+                    end)
+
+                    local kbConn = UserInputService.InputBegan:Connect(function(input, gpe)
+                        if KeybindObj.Binding and not gpe then
+                            if input.UserInputType == Enum.UserInputType.Keyboard then
+                                KeybindObj.Binding = false
+                                if input.KeyCode == Enum.KeyCode.Escape then
+                                    KeybindObj.Value = Enum.KeyCode.Unknown
+                                    kbBtn.Text = "NONE"
+                                else
+                                    KeybindObj.Value = input.KeyCode
+                                    kbBtn.Text = input.KeyCode.Name
+                                end
+                                kbBtn.TextColor3 = ZeroLib.Themes[ZeroLib.ActiveTheme].TextMuted
+                            end
+                        elseif not gpe and input.KeyCode == KeybindObj.Value and KeybindObj.Value ~= Enum.KeyCode.Unknown then
+                            pcall(kbCallback, KeybindObj.Value)
+                        end
+                    end)
+                    table.insert(ZeroLib.Connections, kbConn)
+
+                    ZeroLib.Options[kbId] = KeybindObj
+                    return KeybindObj
+                end
+
+                LabelObj.AddKeyPicker = LabelObj.AddKeybind
+
+                function LabelObj:AddColorPicker(cpId, cpConfig)
+                    local cpDefault = cpConfig.Default or Color3.fromRGB(239, 68, 68)
+                    local cpCallback = cpConfig.Callback or function() end
+
+                    local colorBox = Instance.new("TextButton")
+                    colorBox.Size = UDim2.new(0, 16, 0, 15)
+                    colorBox.BackgroundColor3 = cpDefault
+                    colorBox.BorderSizePixel = 0
+                    colorBox.Text = ""
+                    colorBox.Parent = subContainer
+
+                    local cCorner = Instance.new("UICorner")
+                    cCorner.CornerRadius = UDim.new(0, 3)
+                    cCorner.Parent = colorBox
+
+                    local cStroke = Instance.new("UIStroke")
+                    cStroke.Color = theme.CardStroke
+                    cStroke.Thickness = 1
+                    cStroke.Parent = colorBox
+
+                    ZeroLib:RegisterThemeObject(cStroke, "Color", "CardStroke")
+
+                    return createProColorPicker(cpId, cpDefault, cpCallback, colorBox)
+                end
+
+                setmetatable(LabelObj, {
+                    __index = function(t, k)
+                        return label[k]
+                    end,
+                    __newindex = function(t, k, v)
+                        label[k] = v
+                    end
+                })
+
+                return LabelObj
             end
 
             function Group:AddDivider()
